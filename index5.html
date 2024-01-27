@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rama, Sita, Jungle, Temple, and Shine Animation</title>
+  <style>
+    canvas {
+      border: 1px solid #000;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+    <canvas id="animationCanvas" width="1600" height="1150"></canvas>
+  <script>
+    const canvas = document.getElementById("animationCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const jungleImage = new Image();
+    const templeImage = new Image();
+    const shineImage = new Image();
+    const kalinImage = new Image();
+    const ramaImage = new Image();
+    const sitaImage = new Image();
+    const flowerImage = new Image();
+    const raamjiImage = new Image();
+    const jaiShreeRaamImage = new Image();
+
+
+    jungleImage.src = "images/jungle.jpg"; 
+    templeImage.src = "images/temple.png"; 
+    shineImage.src = "images/shine2.png";   
+    kalinImage.src = "images/kalin.png";  
+    ramaImage.src = "images/ramji1.png";
+    sitaImage.src = "images/ramji1.png";
+    flowerImage.src = "images/rose2.png";
+    raamjiImage.src = "images/shriram.png"; 
+    jaiShreeRaamImage.src = "images/word2.png"; 
+
+    const characters = [
+      { image: ramaImage, x: 50, y: 600, speed: 1 },
+      //{ image: sitaImage, x: 50, y: 200, speed: 2 }
+    ];
+
+    const jungle = { image: jungleImage, x: 0, y: 0, width: canvas.width, height: canvas.height };
+    const temple = { image: templeImage, x: 600, y: 100, width: 900, height: 1200 };
+    const shines = [
+    { x: 600, y:300, width: 150, height: 150, visible: false, animationStep: 0 },
+
+    { x: 700, y:400, width: 150, height: 150, visible: false, animationStep: 0 },
+
+     { x: 800, y: 250, width: 150, height: 150, visible: false, animationStep: 0 },
+      { x: 900, y: 400, width: 100, height: 100, visible: false, animationStep: 0 },
+      { x: 1100, y: 300, width: 200, height: 200, visible: false, animationStep: 0 },
+      { x: 1250, y: 500, width: 150, height: 150, visible: false, animationStep: 0 },
+    ];   
+     const kalin = { image: kalinImage, x: 0, y: 150, width: canvas.width, height: 200 };
+
+    const flowers = [];
+    const jaiShreeRaams = [];
+
+    const jaiShreeRaam = {
+      x: 400,
+      y: 300,
+      visible: false,
+      floatSpeed: 1,
+      floatAmplitude: 10,
+      floatTime: 0
+    };
+
+    function createFlower() {
+      const flower = {
+        image: flowerImage,
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        width: 100,
+        height: 100,
+        speed: Math.random() * 5 + 1,
+        amplitude: Math.random() * 20 + 10,
+        frequency: Math.random() * 0.02 + 0.01,
+        time: 0
+      };
+      flowers.push(flower);
+    }
+
+    function createraam() {
+      const ramjiword = {
+        image: jaiShreeRaamImage,
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        width: 100,
+        height: 100,
+        speed: Math.random() * 5 + 1,
+        amplitude: Math.random() * 20 + 10,
+        frequency: Math.random() * 0.02 + 0.01,
+        time: 0
+      };
+      jaiShreeRaams.push(ramjiword);
+    }
+    function drawCharacter(character) {
+      // Draw character
+      ctx.drawImage(character.image, character.x, character.y, 400, 400);
+    }
+
+    function drawFlowers() {
+      flowers.forEach(flower => {
+        const yOffset = flower.amplitude * Math.sin(flower.frequency * flower.time);
+        ctx.drawImage(flower.image, flower.x, flower.y + yOffset, flower.width, flower.height);
+      });
+    }
+
+    function drawJungle() {
+      ctx.drawImage(jungle.image, jungle.x, jungle.y, jungle.width, jungle.height);
+    }
+
+    function drawTemple() {
+      ctx.drawImage(temple.image, temple.x, temple.y, temple.width, temple.height);
+    }
+    function drawJaiShreeRaam() {
+      if (jaiShreeRaam.visible) {
+        jaiShreeRaams.forEach(flower => {
+        const yOffset = flower.amplitude * Math.sin(flower.frequency * flower.time);
+        ctx.drawImage(flower.image, flower.x, flower.y + yOffset, flower.width, flower.height);
+      });
+      }
+    }
+
+    function drawShines() {
+      shines.forEach(shine => {
+        if (shine.visible) {
+          const scale = 1 + Math.sin(shine.animationStep) * 0.2;
+          ctx.save();
+          ctx.translate(shine.x + shine.width / 2, shine.y + shine.height / 2);
+          ctx.scale(scale, scale);
+          ctx.drawImage(shineImage, -shine.width / 2, -shine.height / 2, shine.width, shine.height);
+          ctx.restore();
+
+          shine.animationStep += 0.05;
+        }
+      });
+    }
+
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawJungle();
+      drawTemple();
+      drawShines();
+
+      flowers.forEach(flower => {
+        flower.x -= flower.speed;
+        flower.time += 1;
+
+        if (flower.x < -flower.width) {
+          flower.x = canvas.width;
+          flower.y = Math.random() * canvas.height;
+        }
+      });
+
+      characters.forEach(character => {
+        drawCharacter(character);
+        character.x += character.speed;
+
+        if (character.x > temple.x - 100) {
+          character.speed = 0; // Stop walking when near the temple
+          shines.forEach(shine => shine.visible = true); // Show all shines when characters reach the temple
+      jaiShreeRaams.forEach(ramjiword => {
+        ramjiword.x -= ramjiword.speed;
+        ramjiword.time += 1;
+
+        if (ramjiword.x < -ramjiword.width) {
+          ramjiword.x = canvas.width;
+          ramjiword.y = Math.random() * canvas.height;
+          jaiShreeRaam.visible = true
+        }
+      });
+        
+        }
+      });
+
+      drawFlowers();
+      drawJaiShreeRaam();
+      requestAnimationFrame(update);
+    }
+
+    for (let i = 0; i < 50; i++) {
+      createFlower();
+    }
+     for (let i = 0; i < 20; i++) {
+      createraam();
+    }
+
+    Promise.all([
+      new Promise(resolve => jungleImage.onload = resolve),
+      new Promise(resolve => templeImage.onload = resolve),
+      new Promise(resolve => shineImage.onload = resolve),
+      new Promise(resolve => kalinImage.onload = resolve),
+      new Promise(resolve => ramaImage.onload = resolve),
+      new Promise(resolve => sitaImage.onload = resolve),
+      new Promise(resolve => flowerImage.onload = resolve)
+    ]).then(() => {
+      update();
+    });
+  </script>
+</body>
+</html>
